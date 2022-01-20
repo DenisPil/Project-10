@@ -46,16 +46,26 @@ class Issue(models.Model):
     description = models.fields.CharField(max_length=2048)
     tag = models.fields.CharField(choices=Tags.choices, max_length=8)
     priority = models.fields.CharField(choices=Priorites.choices, max_length=8)
-    project_id = models.ForeignKey('Project', on_delete=models.CASCADE,related_name='issue_id_for_project')
+    project_id = models.ForeignKey('Project',
+                                   on_delete=models.CASCADE,
+                                   related_name='issue_id_for_project')
     status = models.fields.CharField(max_length=64)
-    author_user_id = models.ForeignKey('User', on_delete=models.CASCADE,related_name='author_user_id_issue')
-    assignee_user_id = models.ForeignKey('User', on_delete=models.CASCADE,related_name='assignee_user_id_issue')
+    author_user_id = models.ForeignKey('User',
+                                       on_delete=models.CASCADE,
+                                       related_name='author_user_id_issue')
+    assignee_user_id = models.ForeignKey('User',
+                                         on_delete=models.CASCADE,
+                                         related_name='assignee_user_id_issue')
     created_time = models.DateTimeField(auto_now_add=True)
 
 
 class Com(models.Model):
     
     description = models.fields.CharField(max_length=2048)
-    author_user_id = models.ForeignKey('User', on_delete=models.CASCADE,related_name='author_user_id_comment')
-    issue_id = models.ForeignKey('Issue', on_delete=models.CASCADE,related_name='comment_id_for_issue')
+    author_user_id = models.ForeignKey('User',
+                                       on_delete=models.CASCADE,
+                                       related_name='author_user_id_comment')
+    issue_id = models.ForeignKey('Issue',
+                                 on_delete=models.CASCADE,
+                                 related_name='comment_id_for_issue')
     created_time = models.DateTimeField(auto_now_add=True)
