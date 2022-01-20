@@ -8,13 +8,14 @@ router = routers.SimpleRouter()
 router.register('project', views.ProjectViewSet, basename='project')
 router.register('issue', views.IssueViewSet, basename='issue')
 router.register('comment', views.CommentViewSet, basename='comment')
+router.register('signup', views.SignUpViewSet, basename='signup')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/',include(router.urls)),
-    path('api/signup/', views.registration_view, name='signup')
+    path('',include(router.urls)),
+
 ]
 
 """

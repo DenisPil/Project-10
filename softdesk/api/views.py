@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet  # ReadOnlyModelViewSet
 from rest_framework import status
-
+from rest_framework.decorators import api_view
 from .models import Issue, Project, Com
 from .serializers import CommentSerializer, ProjectSerializer, IssueSerializer, SignupSerializer
 
@@ -38,15 +38,18 @@ class CommentViewSet(ModelViewSet):
         return queryset
 
 
-def registration_view(request):
-    if request.method =='POST':
-        serializer = SignupSerializer
-        data = {}
-        if serializer.is_valid():
-            account = serializer.save()
-            data['response'] = "Successfully registered a new user"
-            data['email'] = account.email
-            data['username'] = account.username
-        else:
-            data = serializer.error
-        return Response(data)
+class SignUpViewSet(ModelViewSet):
+    serializer_class = SignupSerializer
+    @api_view(['POST'])
+    def post_queryset(request):
+        if request.method =='POST':
+            serializer = SignupSerializer(data=request.data)
+            data = {}
+            if serializer.is_valid(request):
+                account = serializer.save()
+                data['response'] = "Successfully registered a new user"
+                data['email'] = account.email
+                data['username'] = account.username
+            else:
+                data = serializer.error
+            return Response(data)
