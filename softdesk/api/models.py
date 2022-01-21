@@ -5,15 +5,15 @@ from django.conf import settings
 
 class User(AbstractUser):
     """class utilisateurs"""
-    projects_creator= models.ManyToManyField('Project', through='Contributor')
 
 
 class Project(models.Model):
     title = models.fields.CharField(max_length=128)
     description = models.fields.CharField(max_length=2048)
     type = models.fields.CharField(max_length=128)
-    # author_user_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, blank=True)
-    author_user_id = models.ManyToManyField('User',through='Contributor')
+    contributor = models.ManyToManyField('User',through='Contributor',
+        related_name='+', through_fields=('project_id',"contributor_id"))
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
 class Contributor(models.Model):
@@ -24,8 +24,8 @@ class Contributor(models.Model):
         (CREATOR, 'Créateur'),
         (CONTRIBUTOR, 'Contributeur'),
     )
-    creator_id = models.ForeignKey('User', on_delete=models.CASCADE,related_name='creator_id_Contributor')
-    project_id = models.ForeignKey('Project', on_delete=models.CASCADE,related_name='project_id_Contributor')
+    project_id = models.ForeignKey('Project', on_delete=models.CASCADE,related_name='project_id')
+    contributor_id = models.ForeignKey('User', on_delete=models.CASCADE,related_name='contributor_id')
 
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, verbose_name='rôle')
 

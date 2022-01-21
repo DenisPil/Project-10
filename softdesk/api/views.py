@@ -6,8 +6,9 @@ from rest_framework.viewsets import ModelViewSet  # ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .models import Issue, Project, Com
-from .serializers import CommentSerializer, ProjectSerializer, IssueSerializer, SignupSerializer
+from django.db.models import Q
+from .models import Project, Issue,  Com
+from .serializers import  ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer
 
 
 class ProjectViewSet(ModelViewSet):
@@ -15,7 +16,9 @@ class ProjectViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Project.objects.all()
+        queryset = Project.objects.filter(Q(creator_id=self.request.user.id) |
+                                          Q(contributor=self.request.user.id))
+        return queryset
 
 
 class IssueViewSet(ModelViewSet):
@@ -42,16 +45,15 @@ class CommentViewSet(ModelViewSet):
 
 class SignUpViewSet(ModelViewSet):
     serializer_class = SignupSerializer
-    @api_view(['POST'])
-    def post_queryset(request):
-        if request.method =='POST':
-            serializer = SignupSerializer(data=request.data)
-            data = {}
-            if serializer.is_valid(request):
-                account = serializer.save()
-                data['response'] = "Successfully registered a new user"
-                data['email'] = account.email
-                data['username'] = account.username
-            else:
-                data = serializer.error
-            return Response(data)
+    # @api_view(['POST'])
+    def create(self, request):
+        serializer = SignupSerializer(data=request.data)
+        data = {}
+        if serializer.is_valid(request):
+            account = serializer.save()
+            data['response'] = "Successfully registered a new user"
+            data['email'] = account.email
+            data['username'] = account.username
+        else:
+            data = serializer.error
+        return Response(data)
