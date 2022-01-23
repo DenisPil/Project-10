@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import  Contributor, Project, User,  Com #Issue,
+from .models import  Contributor, Project, User,  Com, Issue
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['description', 'author_user_id', 'issue_id', 'created_time']
 
 
-"""class IssueSerializer(serializers.ModelSerializer):
+class IssueSerializer(serializers.ModelSerializer):
 
     comment_id_for_issue = CommentSerializer(many=True)
 
@@ -27,14 +27,19 @@ class CommentSerializer(serializers.ModelSerializer):
                   'assignee_user_id',
                   'created_time',
                   'comment_id_for_issue'
-                  ]"""
+                  ]
+
 
 class ContributorSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Contributor
         fields = ['id', 'project_id','contributor_id', "role"]
-        
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'id']     
 
 class ProjectSerializer(serializers.ModelSerializer):
 
@@ -45,8 +50,6 @@ class ProjectSerializer(serializers.ModelSerializer):
                   'description',
                   'type',
                   'creator',
-                  'contributor'
-                  
                   ]
 
 class ProjectDetailSerializer(serializers.ModelSerializer):
@@ -62,8 +65,8 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
                   ]
     def get_contributor(self, instance):
         queryset = instance.contributor.all()
-        print(queryset, '------------------------------------')
-        serializer = ContributorSerializer(queryset, many=True)
+        serializer = UserSerializer(queryset, many=True)
+        print(serializer)
         return serializer.data
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -85,5 +88,4 @@ class SignupSerializer(serializers.ModelSerializer):
         account.set_password(password)
         account.save()
         return account
-
 

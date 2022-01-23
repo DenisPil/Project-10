@@ -7,7 +7,7 @@ from api import views
 
 router = routers.SimpleRouter()
 router.register('project', views.ProjectViewSet, basename='project')
-# router.register('issue', views.IssueViewSet, basename='issue')
+router.register('issue', views.IssueViewSet, basename='issue')
 router.register('comment', views.CommentViewSet, basename='comment')
 router.register('signup', views.SignUpViewSet, basename='signup')
 router.register('contributor', views.ContributorViewSet, basename='contributor')
