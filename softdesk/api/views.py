@@ -1,4 +1,5 @@
 
+from msilib.schema import Error
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,21 +8,65 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.db.models import Q
-from .models import Project, Issue,  Com
-from .serializers import  ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer
+from .models import Project, Issue,  Com, Contributor
+from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer #IssueSerializer
+from django.contrib.auth.decorators import login_required, permission_required
 
+
+
+class MultipleSerializerMixin:
+    # Un mixin est une classe qui ne fonctionne pas de façon autonome
+    # Elle permet d'ajouter des fonctionnalités aux classes qui les étendent
+
+    detail_serializer_class = None
+
+    def get_serializer_class(self):
+        # Notre mixin détermine quel serializer à utiliser
+        # même si elle ne sait pas ce que c'est ni comment l'utiliser
+        if self.action == 'retrieve' and self.detail_serializer_class is not None:
+            # Si l'action demandée est le détail alors nous retournons le serializer de détail
+            return self.detail_serializer_class
+        return super().get_serializer_class()
 
 class ProjectViewSet(ModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated]
+    detail_serializer_class = ProjectDetailSerializer
+    # permission_classes = [IsAuthenticated]
+
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_queryset(self):
         queryset = Project.objects.filter(Q(creator_id=self.request.user.id) |
                                           Q(contributor=self.request.user.id))
+        contributor = self.request.GET.get('contributor')
+        print(contributor)
+
         return queryset
 
+    # @permission_required('delete_project')
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-class IssueViewSet(ModelViewSet):
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        return Response(serializer.data)
+
+
+
+"""class IssueViewSet(ModelViewSet):
     serializer_class = IssueSerializer
 
     def get_queryset(self):
@@ -29,7 +74,7 @@ class IssueViewSet(ModelViewSet):
         project_id = self.request.GET.get('project_id')
         if project_id:
             queryset = queryset.filter(project_id=project_id)
-        return queryset
+        return queryset"""
 
 
 class CommentViewSet(ModelViewSet):
@@ -57,3 +102,32 @@ class SignUpViewSet(ModelViewSet):
         else:
             data = serializer.error
         return Response(data)
+
+class ContributorViewSet(ModelViewSet):
+    serializer_class = ContributorSerializer
+
+    def create(self, request, *args, **kwargs):
+        project = Project.objects.filter(Q(id=request.data['project_id']))
+        project_creator = Project.objects.filter(Q(creator=request.data['contributor_id'])| Q(id=request.data['project_id']))
+        contributors = project[0].contributor.all()
+        if  int(project_creator[0].creator.id) == int(request.data['contributor_id']) and request.data['role'] != 'CREATOR':
+            error =("L'utilisateur est le créateur du projet")
+            return Response(error,status=status.HTTP_400_BAD_REQUEST)
+        for contributor in contributors:
+            if int(request.data['contributor_id']) == contributor.id:
+                error =("L'utilisateur est déja dans le projet")
+                return Response(error,status=status.HTTP_400_BAD_REQUEST)
+            
+
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def get_queryset(self):
+        queryset = Contributor.objects.all()
+
+
+        return queryset

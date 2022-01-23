@@ -22,11 +22,9 @@ class Contributor(models.Model):
 
     ROLE_CHOICES = (
         (CREATOR, 'Créateur'),
-        (CONTRIBUTOR, 'Contributeur'),
-    )
+        (CONTRIBUTOR, 'Contributeur'),)
     project_id = models.ForeignKey('Project', on_delete=models.CASCADE,related_name='project_id')
     contributor_id = models.ForeignKey('User', on_delete=models.CASCADE,related_name='contributor_id')
-
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, verbose_name='rôle')
 
 

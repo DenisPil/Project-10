@@ -1,16 +1,18 @@
 from rest_framework import serializers
 
-from .models import  Project, User, Issue, Com
+from .models import  Contributor, Project, User,  Com #Issue,
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    
+    
     
     class Meta:
         model = Com
         fields = ['description', 'author_user_id', 'issue_id', 'created_time']
 
 
-class IssueSerializer(serializers.ModelSerializer):
+"""class IssueSerializer(serializers.ModelSerializer):
 
     comment_id_for_issue = CommentSerializer(many=True)
 
@@ -25,16 +27,21 @@ class IssueSerializer(serializers.ModelSerializer):
                   'assignee_user_id',
                   'created_time',
                   'comment_id_for_issue'
-                  ]
+                  ]"""
 
+class ContributorSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Contributor
+        fields = ['id', 'project_id','contributor_id', "role"]
+        
 
 class ProjectSerializer(serializers.ModelSerializer):
 
-    #issue_id_for_project = IssueSerializer(many=True)
-
     class Meta:
         model = Project
-        fields = ['title',
+        fields = ['id',
+                  'title',
                   'description',
                   'type',
                   'creator',
@@ -42,6 +49,22 @@ class ProjectSerializer(serializers.ModelSerializer):
                   
                   ]
 
+class ProjectDetailSerializer(serializers.ModelSerializer):
+    contributor = serializers.SerializerMethodField()
+    class Meta:
+        model = Project
+        fields = ['id',
+                  'title',
+                  'description',
+                  'type',
+                  'creator',
+                  'contributor'
+                  ]
+    def get_contributor(self, instance):
+        queryset = instance.contributor.all()
+        print(queryset, '------------------------------------')
+        serializer = ContributorSerializer(queryset, many=True)
+        return serializer.data
 
 class SignupSerializer(serializers.ModelSerializer):
 
@@ -62,4 +85,5 @@ class SignupSerializer(serializers.ModelSerializer):
         account.set_password(password)
         account.save()
         return account
-        
+
+
