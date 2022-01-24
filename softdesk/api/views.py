@@ -11,7 +11,7 @@ from django.db.models import Q
 from .models import Project, Issue,  Com, Contributor
 from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer
 from django.contrib.auth.decorators import login_required, permission_required
-
+from .permissions import CreatorPermissions
 
 
 class MultipleSerializerMixin:
@@ -28,14 +28,14 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
     
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [CreatorPermissions, IsAuthenticated]
 
     def get_queryset(self):
-        print(self.request.GET.get("id"))
+        """print(self.request.GET.get("id"))
         gg = Contributor.objects.filter(contributor_id=self.request.user.id)
         for i in gg:
-            print(i.role, i.contributor_id.id)
-        queryset = Project.objects.filter(Q(creator_id=self.request.user.id)) #|
+            print(i.role, i.contributor_id.id)"""
+        queryset = Project.objects.filter(Q(creator_id=self.request.user.id))# |
                                           #Q(contributor=self.request.user.id))
         """contributor = self.request.GET.get('contributor')
         if contributor:

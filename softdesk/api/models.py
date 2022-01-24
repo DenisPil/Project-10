@@ -48,7 +48,7 @@ class Issue(models.Model):
                                    on_delete=models.CASCADE,
                                    related_name='issue_id_for_project')
     status = models.fields.CharField(max_length=64)
-    author_user_id = models.ForeignKey('User',
+    creator = models.ForeignKey('User',
                                        on_delete=models.CASCADE,
                                        related_name='author_user_id_issue')
     assignee_user_id = models.ForeignKey('User',
@@ -60,7 +60,7 @@ class Issue(models.Model):
 class Com(models.Model):
     
     description = models.fields.CharField(max_length=2048)
-    author_user_id = models.ForeignKey('User',
+    creator = models.ForeignKey('User',
                                        on_delete=models.CASCADE,
                                        related_name='author_user_id_comment')
     issue_id = models.ForeignKey('Issue',

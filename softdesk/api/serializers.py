@@ -7,7 +7,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Com
-        fields = ['description', 'author_user_id', 'issue_id', 'created_time']
+        fields = ['description', 'creator', 'issue_id', 'created_time']
 
 
 class IssueDetailSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class IssueDetailSerializer(serializers.ModelSerializer):
                   'priority',
                   'project_id',
                   'status',
-                  'author_user_id',
+                  'creator',
                   'assignee_user_id',
                   'created_time',
                   
@@ -38,7 +38,7 @@ class IssueSerializer(serializers.ModelSerializer):
                     'tag', 
                     'priority',
                     'status',
-                    'author_user_id',
+                    'creator',
                     'assignee_user_id',
                     'created_time',
                     ]
