@@ -31,7 +31,7 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
     permission_classes = [CreatorPermissions, IsAuthenticated]
 
     def get_queryset(self):
-        """print(self.request.GET.get("id"))
+        """print(self.request.GET.get("id")rr)
         gg = Contributor.objects.filter(contributor_id=self.request.user.id)
         for i in gg:
             print(i.role, i.contributor_id.id)"""
