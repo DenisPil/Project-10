@@ -31,6 +31,10 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
     # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        print(self.request.GET.get("id"))
+        gg = Contributor.objects.filter(contributor_id=self.request.user.id)
+        for i in gg:
+            print(i.role, i.contributor_id.id)
         queryset = Project.objects.filter(Q(creator_id=self.request.user.id)) #|
                                           #Q(contributor=self.request.user.id))
         """contributor = self.request.GET.get('contributor')
@@ -45,19 +49,18 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IssueViewSet(ModelViewSet):
@@ -71,9 +74,29 @@ class IssueViewSet(ModelViewSet):
             queryset = queryset.filter(project_id=project_id)
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CommentViewSet(ModelViewSet):
-    
+
     serializer_class = CommentSerializer
 
     def get_queryset(self):
@@ -83,11 +106,30 @@ class CommentViewSet(ModelViewSet):
             queryset = queryset.filter(issue_id=issue_id)
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SignUpViewSet(ModelViewSet):
 
     serializer_class = SignupSerializer
-
 
     def create(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -101,9 +143,14 @@ class SignUpViewSet(ModelViewSet):
             data = serializer.error
         return Response(data)
 
+
 class ContributorViewSet(ModelViewSet):
-    
+
     serializer_class = ContributorSerializer
+
+    def get_queryset(self):
+        queryset = Contributor.objects.all()
+        return queryset
 
     def create(self, request, *args, **kwargs):
         project = Project.objects.filter(Q(id=request.data['project_id']))
@@ -121,7 +168,3 @@ class ContributorViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def get_queryset(self):
-        queryset = Contributor.objects.all()
-        return queryset

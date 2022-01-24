@@ -12,7 +12,7 @@ class Project(models.Model):
     description = models.fields.CharField(max_length=2048)
     type = models.fields.CharField(max_length=128)
     contributor = models.ManyToManyField('User',through='Contributor',
-        related_name='+', through_fields=('project_id',"contributor_id"))
+        related_name='+') #through_fields=('project_id',"contributor_id")
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
