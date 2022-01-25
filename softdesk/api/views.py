@@ -11,7 +11,7 @@ from django.db.models import Q
 from .models import Project, Issue,  Com, Contributor
 from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer, IssueDetailSerializer
 from django.contrib.auth.decorators import login_required, permission_required
-from .permissions import IsProjectAuthor, IsProjectContributor , IsIssueAuthor
+from .permissions import IsProjectAuthor,  IsIssueAuthor, IsProjectContributor #, IsCommentAuthor, IsProjectContributor 
 
 
 class MultipleSerializerMixin:
@@ -28,9 +28,9 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
     
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-    #permission_classes = [CreatorPermissions, IsAuthenticated]
+    permission_classes = [IsProjectAuthor]
 
-    def get_queryset(self):
+    def get_queryset(self,*args, **kwargs):
         """print(self.request.GET.get("id")rr)
         gg = Contributor.objects.filter(contributor_id=self.request.user.id)
         for i in gg:
@@ -67,7 +67,7 @@ class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
     
     serializer_class = IssueSerializer
     detail_serializer_class = IssueDetailSerializer
-    permission_classes = [IsProjectAuthor or IsProjectContributor or IsIssueAuthor]
+    permission_classes = [IsIssueAuthor or IsProjectAuthor or IsProjectContributor]
     
     def get_queryset(self,*args, **kwargs):
         queryset = Issue.objects.all()
@@ -101,7 +101,7 @@ class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
 class CommentViewSet(ModelViewSet):
 
     serializer_class = CommentSerializer
-
+    #permission_classes = [IsAuthenticated, IsCommentAuthor]
     def get_queryset(self):
         queryset = Com.objects.all()
         issue_id = self.request.GET.get('issue_id')
@@ -150,7 +150,7 @@ class SignUpViewSet(ModelViewSet):
 class ContributorViewSet(ModelViewSet):
 
     serializer_class = ContributorSerializer
-
+    #permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Contributor.objects.all()

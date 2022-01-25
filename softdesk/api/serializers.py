@@ -7,7 +7,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Com
-        fields = ['description', 'creator', 'issue_id', 'created_time']
+        fields = ['id','description', 'creator', 'issue_id', 'created_time']
 
 
 class IssueDetailSerializer(serializers.ModelSerializer):
