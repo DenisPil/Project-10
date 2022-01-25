@@ -11,13 +11,21 @@ from django.conf import settings
 
 
 router = routers.SimpleRouter()
-projects_router = routers.SimpleRouter(trailing_slash=False)
+router.register('signup', views.SignUpViewSet, basename='signup')
+projects_router = routers.SimpleRouter()
 # projects_router.register('project', views.ProjectViewSet, basename='project')
-projects_router.register(r"project/?", views.ProjectViewSet, basename="project")
+projects_router.register(r"projects/?", views.ProjectViewSet, basename="projects")
 
 
-issues_router = routers.NestedSimpleRouter(projects_router, r"project/?", lookup="project", trailing_slash=False)
+issues_router = routers.NestedSimpleRouter(projects_router, r"projects/?", lookup="projects")
 issues_router.register(r"issues/?", views.IssueViewSet, basename="issues")
+
+contributors_router = routers.NestedSimpleRouter(projects_router, r"projects/?", lookup="projects")
+contributors_router.register(r"contributors/?", views.ContributorViewSet, basename="contributors")
+
+comments_router = routers.NestedSimpleRouter(issues_router, r"issues/?", lookup="issues")
+comments_router.register(r"comments/?", views.IssueViewSet, basename="comments")
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
@@ -31,11 +39,31 @@ urlpatterns = [
 
 ]
 
+"""# création du routeur
+router = routers.SimpleRouter()
+# déclaration de project afin de générer l'URL correspondante
+projects_router = routers.SimpleRouter(trailing_slash=False)
+projects_router.register(r"projects/?", ProjectViewset, basename="projects")
+
+users_router = routers.NestedSimpleRouter(projects_router, r"projects/?", lookup="projects", trailing_slash=False)
+users_router.register(r"users/?", ContributorViewset, basename="users")
+
+issues_router = routers.NestedSimpleRouter(projects_router, r"projects/?", lookup="projects", trailing_slash=False)
+issues_router.register(r"issues/?", IssueViewset, basename="issues")
+comments_router = routers.NestedSimpleRouter(issues_router, r"issues/?", lookup="issues", trailing_slash=False)
+comments_router.register(r"comments/?", CommentViewset, basename="comments")
+
+urlpatterns = [
+
+	path("", include(comments_router.urls)),
+
+	path('', include(router.urls)), # urls du router pour rendre les urls disponibles
+	#path('', include('user.urls')),
+]
 
 
 
-"""
-    endpoint :  
+endpoint :  
                 http://127.0.0.1:8000/api/issue/?project_id='ID'
                 http://127.0.0.1:8000/api/comment/?issue_id='ID'
                 

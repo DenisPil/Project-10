@@ -46,7 +46,8 @@ class Issue(models.Model):
     priority = models.fields.CharField(choices=Priorites.choices, max_length=8)
     project_id = models.ForeignKey('Project',
                                    on_delete=models.CASCADE,
-                                   related_name='issue_id_for_project')
+                                   related_name='issue_id_for_project',
+                                   null=True)
     status = models.fields.CharField(max_length=64)
     creator = models.ForeignKey('User',
                                        on_delete=models.CASCADE,

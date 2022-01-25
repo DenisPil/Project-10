@@ -31,17 +31,19 @@ class IssueDetailSerializer(serializers.ModelSerializer):
 
 class IssueSerializer(serializers.ModelSerializer):
 
-        class Meta:
-            model = Issue
-            fields = ['title',
-                    'description',
-                    'tag', 
-                    'priority',
-                    'status',
-                    'creator',
-                    'assignee_user_id',
-                    'created_time',
-                    ]
+    class Meta:
+        model = Issue
+        fields = ['id',
+                  "project_id",
+                'title',
+                'description',
+                'tag', 
+                'priority',
+                'status',
+                'creator',
+                'assignee_user_id',
+                'created_time',
+                ]
 
 
 class ContributorSerializer(serializers.ModelSerializer):
@@ -85,12 +87,16 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
                   'contributor',
                   'issue_id_for_project'
                   ]
-
+        
     def get_contributor(self, instance):
         queryset = instance.contributor.all()
         serializer = UserSerializer(queryset, many=True)
         return serializer.data
 
+    """def get_issue_id_for_project(self, instance):
+        queryset = instance.issue_id_for_project.all()
+        serializer = IssueSerializer(queryset, many=True)
+        return serializer.data"""
 
 class SignupSerializer(serializers.ModelSerializer):
 

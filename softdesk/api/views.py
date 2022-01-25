@@ -11,7 +11,7 @@ from django.db.models import Q
 from .models import Project, Issue,  Com, Contributor
 from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer
 from django.contrib.auth.decorators import login_required, permission_required
-from .permissions import CreatorPermissions
+from .permissions import IsProjectAuthor, IsProjectContributor , IsIssueAuthor
 
 
 class MultipleSerializerMixin:
@@ -28,7 +28,7 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
     
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-    permission_classes = [CreatorPermissions, IsAuthenticated]
+    #permission_classes = [CreatorPermissions, IsAuthenticated]
 
     def get_queryset(self):
         """print(self.request.GET.get("id")rr)
@@ -62,31 +62,23 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class ProjectDetailViewSet(MultipleSerializerMixin, ModelViewSet):
-    serializer_class = ProjectDetailSerializer
 
 class IssueViewSet(ModelViewSet):
-
-    serializer_class = IssueSerializer
-    def get_queryset(self, project_id):
-        """print(self.request.GET.get("id")rr)
-        gg = Contributor.objects.filter(contributor_id=self.request.user.id)
-        for i in gg:
-            print(i.role, i.contributor_id.id)"""
-        queryset = Project.objects.filter(Q(creator_id=self.request.user.id))# |
-                                          #Q(contributor=self.request.user.id))
-        """contributor = self.request.GET.get('contributor')
-        if contributor:
-            queryset = queryset.filter(contributor=contributor)"""
-        return queryset
     
-
-    def get_queryset(self):
+    serializer_class = IssueSerializer
+    permission_classes = [IsProjectAuthor or IsProjectContributor or IsIssueAuthor]
+    def get_queryset(self,*args, **kwargs):
         queryset = Issue.objects.all()
-        project_id = self.request.GET.get('project_id')
+
+        #print(self.request.parser_context)
+        print(self.request.parser_context['kwargs']['projects__pk'])
+        project_id = self.request.parser_context['kwargs']['projects__pk']
+
         if project_id:
             queryset = queryset.filter(project_id=project_id)
+            print(queryset)
         return queryset
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
