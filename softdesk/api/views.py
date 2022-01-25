@@ -62,10 +62,24 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class ProjectDetailViewSet(MultipleSerializerMixin, ModelViewSet):
+    serializer_class = ProjectDetailSerializer
 
 class IssueViewSet(ModelViewSet):
 
     serializer_class = IssueSerializer
+    def get_queryset(self, project_id):
+        """print(self.request.GET.get("id")rr)
+        gg = Contributor.objects.filter(contributor_id=self.request.user.id)
+        for i in gg:
+            print(i.role, i.contributor_id.id)"""
+        queryset = Project.objects.filter(Q(creator_id=self.request.user.id))# |
+                                          #Q(contributor=self.request.user.id))
+        """contributor = self.request.GET.get('contributor')
+        if contributor:
+            queryset = queryset.filter(contributor=contributor)"""
+        return queryset
+    
 
     def get_queryset(self):
         queryset = Issue.objects.all()
