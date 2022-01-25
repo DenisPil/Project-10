@@ -12,7 +12,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class IssueDetailSerializer(serializers.ModelSerializer):
 
-    #comment_id_for_issue = CommentSerializer(many=True)
+    comment_id_for_issue = CommentSerializer(many=True)
 
     class Meta:
         model = Issue
@@ -25,7 +25,7 @@ class IssueDetailSerializer(serializers.ModelSerializer):
                   'creator',
                   'assignee_user_id',
                   'created_time',
-                  
+                  'comment_id_for_issue'
                   ]
 #'comment_id_for_issue'
 

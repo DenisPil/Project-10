@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.db.models import Q
 from .models import Project, Issue,  Com, Contributor
-from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer
+from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer, IssueDetailSerializer
 from django.contrib.auth.decorators import login_required, permission_required
 from .permissions import IsProjectAuthor, IsProjectContributor , IsIssueAuthor
 
@@ -63,22 +63,19 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class IssueViewSet(ModelViewSet):
+class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
     
     serializer_class = IssueSerializer
+    detail_serializer_class = IssueDetailSerializer
     permission_classes = [IsProjectAuthor or IsProjectContributor or IsIssueAuthor]
+    
     def get_queryset(self,*args, **kwargs):
         queryset = Issue.objects.all()
-
-        #print(self.request.parser_context)
-        print(self.request.parser_context['kwargs']['projects__pk'])
         project_id = self.request.parser_context['kwargs']['projects__pk']
-
         if project_id:
             queryset = queryset.filter(project_id=project_id)
             print(queryset)
         return queryset
-
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -154,8 +151,14 @@ class ContributorViewSet(ModelViewSet):
 
     serializer_class = ContributorSerializer
 
+
     def get_queryset(self):
         queryset = Contributor.objects.all()
+        project_id = self.request.parser_context['kwargs']['projects__pk']
+        print(project_id)
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+            print(queryset)
         return queryset
 
     def create(self, request, *args, **kwargs):
