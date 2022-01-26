@@ -1,107 +1,82 @@
+from genericpath import exists
 from xml.etree.ElementTree import Comment
 from rest_framework.permissions import BasePermission
 from rest_framework import permissions
-from .models import Project, Issue, Contributor
+from .models import Com, Project, Issue, Contributor
+from rest_framework.response import Response
+from rest_framework import status
+
+CONTRIBUTOR_PERMS = [ 'GET', 'POST' ]
+CREATOR_PERMS = ['PUT', 'DELETE']
 
 
-METHODES_CREATE_READ = [ 'GET', 'POST' ]
-METHODES_PUT_DEL = ['GET', 'POST', 'PUT', 'DELETE']
-
-class IsProjectAuthor(BasePermission):
-    """Author of project can Create and Read issues"""
-    message = "L'utilisateur doit être l'auteur ou le contributeur du projet"
-
-    def has_permission(self, request, view):
-        print(view.kwargs)
-        index_project = view.kwargs['pk']
-        project = Project.objects.get(id=index_project)
-        if project.creator.id == request.user.id: # si le user est l'autheur du projet
-            if request.method in METHODES_CREATE_READ: # Pour lecture et ecriture
-                print("IsProjectAuthor")
-                return True
-
-
-class IsProjectContributor(BasePermission):
-    """Contributors of project can Create and Read issues"""
-    message = "L'utilisateur doit être l'auteur ou le contributeur du projet"
-
-    def has_permission(self, request, view):
-        index_project = view.kwargs['projects_pk']
-        contributeurs_project = Contributor.objects.filter(
-            project_id__id=index_project)
-        for contributor in contributeurs_project:
-            if contributor.user_id.id == request.user.id: #
-                if request.method in METHODES_CREATE_READ: # Pour lecture et ecriture
-                    print("IsProjectContributor")
-                    return True
-            
-        
-class IsIssueAuthor(BasePermission):
-    """Author of Issue can Update and Delete issues """
-    message = "L'utilisateur doit être l'auteur du problème"
-
-    def has_permission(self, request, view):
-        print(request.parser_context, "zezeezeezezezeezezezze---------------------------")
-        id_issue = view.kwargs['pk']
-        issue = Issue.objects.get(id=id_issue)
-        print(issue.assignee_user_id.id == request.user.id)
-        if issue.assignee_user_id.id == request.user.id: # si l'utilisateur est l'auteur du problème
-            if request.method in METHODES_PUT_DEL: # pour MAJ et suppression
-                return True
-
-"""class IsProjectAuthor(BasePermission):
-    message = "L'utilisateur n'est pas l'auteur ou un conzezeztributeur"
-
-    def has_permission(self, request, view):
-        print(view.kwargs,'é"é"é"é"é"')
-        index_project = view.kwargs['projects__pk']
-        project = Project.objects.get(id=index_project)
-        if project.creator.id == request.user.id:
-            if request.method in METHODES_CREATE_READ:
-                return True
 class IsProjectAuthor(BasePermission):
     
-    message = "L'utilisateur doit être l'auteur ou le contributeur du projet"
+    message = "1Vous n'avez pas la permission d'effectuer cette action."
 
     def has_object_permission(self, request, view, obj):
                
         if obj.creator.id == request.user.id:
+            print('CREATOR')
             return True
-            
+
+
 class IsProjectContributor(BasePermission):
-    message = "L'utilisateur n'est pas  un contributeur"
+
+    message = "2Vous n'avez pas la permission d'effectuer cette action."
+
+    def has_object_permission(self, request, view, obj):
+        index_project = obj.id
+        contributors_in_project = Contributor.objects.filter(
+            project_id__id=index_project)
+        for contributor in contributors_in_project:
+            if contributor.contributor_id.id == request.user.id:
+                if request.method in CONTRIBUTOR_PERMS:
+                    return True
+
+
+class IsIssueAuthor(BasePermission):
+    message = "3Vous n'avez pas la permission d'effectuer cette action."
+    def has_object_permission(self, request, view, obj):
+        issue = Issue.objects.get(id=obj.id)
+        print(issue.creator.id == request.user.id,issue.creator.id, request.user.id)
+        if issue.creator.id == request.user.id:
+            if request.method in CREATOR_PERMS: 
+                return True
+        """if issue.creator.id != request.user.id:
+            if request.method in CONTRIBUTOR_PERMS: 
+                return True"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""class IsProjectAuthor(BasePermission):
+
+    message = ""
 
     def has_permission(self, request, view):
         index_project = view.kwargs['projects__pk']
-        
-        contributeurs_project = Contributor.objects.filter(
-            project_id__id=index_project)
-        for contributor in contributeurs_project:
-            if contributor.user_id.id == request.user.id:
-                if request.method in METHODES_CREATE_READ:
-                    return True
-            
-        
-class IsIssueAuthor(BasePermission):
-    message = "L'utilisateur n'est pas l'auteur du problème"
-
-    def has_permission(self, request, view):
-        print(view.kwargs, "ISSUE")
-        id_issue = view.kwargs["projects__pk"]
-        
-        issue = Issue.objects.get(id=id_issue)
-        if issue.assignee_user_id.id == request.user.id:
-            if request.method in METHODES_PUT_DEL:
-                return True
-
-class IsCommentAuthor(BasePermission):
-    message = "L'utilisateur n'est pas l'auteur du commentaire"
-
-    def has_permission(self, request, view):
-    
-        print(view.kwargs['pk'])
-        id_issue = view.kwargs['pk']
-        issue = Issue.objects.get(id=id_issue)
-        if issue.assignee_user_id.id == request.user.id: # si l'utilisateur est l'auteur du problème
-            if request.method in METHODES_PUT_DEL: # pour MAJ et suppression
+        project = Project.objects.get(id=index_project)
+        if project.creator.id == request.user.id:
+            if request.method in CONTRIBUTOR_PERMS:
                 return True"""
