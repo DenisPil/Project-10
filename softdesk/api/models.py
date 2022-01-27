@@ -4,10 +4,13 @@ from django.conf import settings
 
 
 class User(AbstractUser):
-    """class utilisateurs"""
+    """classe qui représente le model des utilisateurs"""
 
 
 class Project(models.Model):
+    
+    """Classe qui représente le model des projets"""
+    
     title = models.fields.CharField(max_length=128)
     description = models.fields.CharField(max_length=2048)
     type = models.fields.CharField(max_length=128)
@@ -17,6 +20,9 @@ class Project(models.Model):
 
 
 class Contributor(models.Model):
+
+    """ Classe qui représente le model des contributeurs qui fait le liens entre les utilisateurs et les projects"""
+
     CREATOR = 'CREATOR'
     CONTRIBUTOR = 'CONTRIBUTOR'
 
@@ -29,6 +35,8 @@ class Contributor(models.Model):
 
 
 class Issue(models.Model):
+
+    """ Classe qui représente le model des problémes """
 
     class Tags(models.TextChoices):
         BUG = 'BUG'
@@ -59,6 +67,8 @@ class Issue(models.Model):
 
 
 class Com(models.Model):
+
+    """ Classe qui représente le model des commentaires """
 
     description = models.fields.CharField(max_length=2048)
     creator = models.ForeignKey('User',

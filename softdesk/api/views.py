@@ -28,6 +28,8 @@ class MultipleSerializerMixin:
 
 class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
 
+    """ Le ModelViewSet des projets """
+
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
     permission_classes = [IsProjectAuthor | IsProjectContributor, IsAuthenticated]
@@ -61,6 +63,8 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
 
 
 class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
+
+    """ Le ModelViewSet des problèmes """
 
     serializer_class = IssueSerializer
     detail_serializer_class = IssueDetailSerializer
@@ -97,6 +101,8 @@ class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
 
+    """ Le ModelViewSet des commentaires """
+
     serializer_class = CommentSerializer
     permission_classes = [IsCommentAuthor | IsProjectAuthor | IsProjectContributor, IsAuthenticated]
 
@@ -130,6 +136,8 @@ class CommentViewSet(ModelViewSet):
 
 class SignUpViewSet(ModelViewSet):
 
+    """ Le ModelViewSet de l'inscription """
+
     serializer_class = SignupSerializer
 
     def create(self, request):
@@ -146,6 +154,8 @@ class SignUpViewSet(ModelViewSet):
 
 
 class ContributorViewSet(ModelViewSet):
+
+    """ Le ModelViewSet des contributeurs """
 
     serializer_class = ContributorSerializer
 
