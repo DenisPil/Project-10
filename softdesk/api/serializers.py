@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from .models import  Contributor, Project, User,  Com, Issue
+from .models import Contributor, Project, User, Com, Issue
 
 
 class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Com
-        fields = ['id','description', 'creator', 'issue_id', 'created_time']
+        fields = ['id', 'description', 'creator', 'issue_id', 'created_time']
 
 
 class IssueDetailSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class IssueDetailSerializer(serializers.ModelSerializer):
         model = Issue
         fields = ['title',
                   'description',
-                  'tag', 
+                  'tag',
                   'priority',
                   'project_id',
                   'status',
@@ -27,7 +27,6 @@ class IssueDetailSerializer(serializers.ModelSerializer):
                   'created_time',
                   'comment_id_for_issue'
                   ]
-#'comment_id_for_issue'
 
 class IssueSerializer(serializers.ModelSerializer):
 
@@ -35,22 +34,22 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = ['id',
                   "project_id",
-                'title',
-                'description',
-                'tag', 
-                'priority',
-                'status',
-                'creator',
-                'assignee_user_id',
-                'created_time',
-                ]
+                  'title',
+                  'description',
+                  'tag',
+                  'priority',
+                  'status',
+                  'creator',
+                  'assignee_user_id',
+                  'created_time',
+                  ]
 
 
 class ContributorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contributor
-        fields = ['id', 'project_id','contributor_id', "role"]
+        fields = ['id', 'project_id', 'contributor_id', "role"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -87,16 +86,12 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
                   'contributor',
                   'issue_id_for_project'
                   ]
-        
+
     def get_contributor(self, instance):
         queryset = instance.contributor.all()
         serializer = UserSerializer(queryset, many=True)
         return serializer.data
 
-    """def get_issue_id_for_project(self, instance):
-        queryset = instance.issue_id_for_project.all()
-        serializer = IssueSerializer(queryset, many=True)
-        return serializer.data"""
 
 class SignupSerializer(serializers.ModelSerializer):
 
@@ -114,4 +109,3 @@ class SignupSerializer(serializers.ModelSerializer):
         account.set_password(password)
         account.save()
         return account
-

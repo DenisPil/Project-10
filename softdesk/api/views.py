@@ -8,14 +8,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.db.models import Q
-from .models import Project, Issue,  Com, Contributor
-from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer, IssueDetailSerializer
+from .models import Project, Issue, Com, Contributor
+from .serializers import (ContributorSerializer,
+                          ProjectDetailSerializer,
+                          ProjectSerializer,
+                          SignupSerializer,
+                          CommentSerializer,
+                          IssueSerializer,
+                          IssueDetailSerializer)
 from django.contrib.auth.decorators import login_required, permission_required
 from .permissions import IsProjectAuthor, IsProjectContributor, IsIssueAuthor, IsCommentAuthor
 
 
 class MultipleSerializerMixin:
-    
+
     detail_serializer_class = None
 
     def get_serializer_class(self):
@@ -25,24 +31,16 @@ class MultipleSerializerMixin:
 
 
 class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
-    
+
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
     permission_classes = [IsProjectAuthor | IsProjectContributor]
 
-    def get_queryset(self,*args, **kwargs):
-        """print(self.request.GET.get("id")rr)
-        gg = Contributor.objects.filter(contributor_id=self.request.user.id)
-        for i in gg:
-            print(i.role, i.contributor_id.id)"""
+    def get_queryset(self, *args, **kwargs):
         if "pk" in self.kwargs:
             return Project.objects.filter(pk=self.kwargs['pk'])
-        queryset = Project.objects.filter(Q(creator_id=self.request.user.id) |
-                                          Q(contributor=self.request.user.id)).distinct()
-        print(queryset, self.kwargs, kwargs,self.request.user.id)
-        """contributor = self.request.GET.get('contributor')
-        if contributor:
-            queryset = queryset.filter(contributor=contributor)"""
+        queryset = Project.objects.filter(Q(creator_id=self.request.user.id) | Q(contributor=self.request.user.id)
+                                          ).distinct()
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -67,12 +65,12 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
 
 
 class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
-    
+
     serializer_class = IssueSerializer
     detail_serializer_class = IssueDetailSerializer
     permission_classes = [IsIssueAuthor | IsProjectAuthor | IsProjectContributor]
-    
-    def get_queryset(self,*args, **kwargs):
+
+    def get_queryset(self, *args, **kwargs):
         queryset = Issue.objects.all()
         print(self.kwargs['projects__pk'])
         project_id = self.request.parser_context['kwargs']['projects__pk']
@@ -105,6 +103,7 @@ class CommentViewSet(ModelViewSet):
 
     serializer_class = CommentSerializer
     permission_classes = [IsCommentAuthor | IsProjectAuthor | IsProjectContributor]
+
     def get_queryset(self):
         queryset = Com.objects.all()
         issue_id = self.request.GET.get('issue_id')
@@ -153,7 +152,6 @@ class SignUpViewSet(ModelViewSet):
 class ContributorViewSet(ModelViewSet):
 
     serializer_class = ContributorSerializer
-    #permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Contributor.objects.all()
@@ -166,15 +164,20 @@ class ContributorViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         project = Project.objects.filter(Q(id=request.data['project_id']))
-        project_creator = Project.objects.filter(Q(creator=request.data['contributor_id'])| Q(id=request.data['project_id']))
-        #contributors = project[0].contributor.all()
-        """if  int(project_creator[0].creator.id) == int(request.data['contributor_id']) and request.data['role'] != 'CREATOR':
-            error =("L'utilisateur est le créateur du projet")
-            return Response(error,status=status.HTTP_400_BAD_REQUEST)
+        project_creator = Project.objects.filter(Q(creator=request.data['contributor_id']) | Q(id=request.data[
+            'project_id']))
+        contributors = project[0].contributor.all()
+
+        if int(project_creator[0].creator.id) == int(request.data['contributor_id']) and request.data[
+                'role'] != 'CREATOR':
+            error = ("L'utilisateur est le créateur du projet")
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
         for contributor in contributors:
             if int(request.data['contributor_id']) == contributor.id:
-                error =("L'utilisateur est déja dans le projet")
-                return Response(error,status=status.HTTP_400_BAD_REQUEST)"""
+                error = ("L'utilisateur est déja dans le projet")
+                return Response(error, responsestatus=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
