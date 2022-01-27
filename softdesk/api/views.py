@@ -1,12 +1,7 @@
-
-from msilib.schema import Error
-from django.shortcuts import render
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet  # ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from rest_framework.decorators import api_view
 from django.db.models import Q
 from .models import Project, Issue, Com, Contributor
 from .serializers import (ContributorSerializer,
@@ -16,11 +11,12 @@ from .serializers import (ContributorSerializer,
                           CommentSerializer,
                           IssueSerializer,
                           IssueDetailSerializer)
-from django.contrib.auth.decorators import login_required, permission_required
 from .permissions import IsProjectAuthor, IsProjectContributor, IsIssueAuthor, IsCommentAuthor
 
 
 class MultipleSerializerMixin:
+
+    """ Mixin permet d'afficher les vue en détail ou en liste"""
 
     detail_serializer_class = None
 
@@ -34,7 +30,7 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
 
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-    permission_classes = [IsProjectAuthor | IsProjectContributor]
+    permission_classes = [IsProjectAuthor | IsProjectContributor, IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
         if "pk" in self.kwargs:
@@ -68,7 +64,7 @@ class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
 
     serializer_class = IssueSerializer
     detail_serializer_class = IssueDetailSerializer
-    permission_classes = [IsIssueAuthor | IsProjectAuthor | IsProjectContributor]
+    permission_classes = [IsIssueAuthor | IsProjectAuthor | IsProjectContributor, IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
         queryset = Issue.objects.all()
@@ -102,7 +98,7 @@ class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
 class CommentViewSet(ModelViewSet):
 
     serializer_class = CommentSerializer
-    permission_classes = [IsCommentAuthor | IsProjectAuthor | IsProjectContributor]
+    permission_classes = [IsCommentAuthor | IsProjectAuthor | IsProjectContributor, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Com.objects.all()
