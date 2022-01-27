@@ -8,9 +8,9 @@ class User(AbstractUser):
 
 
 class Project(models.Model):
-    
+
     """Classe qui représente le model des projets"""
-    
+
     title = models.fields.CharField(max_length=128)
     description = models.fields.CharField(max_length=2048)
     type = models.fields.CharField(max_length=128)
@@ -29,7 +29,7 @@ class Contributor(models.Model):
     ROLE_CHOICES = (
         (CREATOR, 'Créateur'),
         (CONTRIBUTOR, 'Contributeur'),)
-    project_id = models.ForeignKey('Project', on_delete=models.CASCADE, related_namerelated_name='project_id')
+    project_id = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='project_id')
     contributor_id = models.ForeignKey('User', on_delete=models.CASCADE, related_name='contributor_id')
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, verbose_name='rôle')
 

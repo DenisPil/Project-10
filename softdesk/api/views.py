@@ -182,7 +182,7 @@ class ContributorViewSet(ModelViewSet):
         for contributor in contributors:
             if int(request.data['contributor_id']) == contributor.id:
                 error = ("L'utilisateur est déja dans le projet")
-                return Response(error, responsestatus=status.HTTP_400_BAD_REQUEST)
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
