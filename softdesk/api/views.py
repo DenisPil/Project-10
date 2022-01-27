@@ -11,7 +11,7 @@ from django.db.models import Q
 from .models import Project, Issue,  Com, Contributor
 from .serializers import  ContributorSerializer, ProjectDetailSerializer, ProjectSerializer, SignupSerializer, CommentSerializer, IssueSerializer, IssueDetailSerializer
 from django.contrib.auth.decorators import login_required, permission_required
-from .permissions import IsProjectAuthor, IsProjectContributor, IsIssueAuthor
+from .permissions import IsProjectAuthor, IsProjectContributor, IsIssueAuthor, IsCommentAuthor
 
 
 class MultipleSerializerMixin:
@@ -104,7 +104,7 @@ class IssueViewSet(MultipleSerializerMixin, ModelViewSet):
 class CommentViewSet(ModelViewSet):
 
     serializer_class = CommentSerializer
-    # permission_classes = [IsProjectAuthor | IsProjectContributor]
+    permission_classes = [IsCommentAuthor | IsProjectAuthor | IsProjectContributor]
     def get_queryset(self):
         queryset = Com.objects.all()
         issue_id = self.request.GET.get('issue_id')
