@@ -2,23 +2,28 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_nested import routers
-from api import views
+
+from user.views import SignUpViewSet
+from project.views import ProjectViewSet
+from issue.views import IssueViewSet
+from contributor.views import ContributorViewSet
+from comment.views import CommentViewSet
 
 
 router = routers.SimpleRouter()
-router.register('signup', views.SignUpViewSet, basename='signup')
+router.register('signup', SignUpViewSet, basename='signup')
 
 projects_router = routers.SimpleRouter()
-projects_router.register(r"projects/?", views.ProjectViewSet, basename="projects")
+projects_router.register(r"projects/?", ProjectViewSet, basename="projects")
 
 issues_router = routers.NestedSimpleRouter(projects_router, r"projects/?", lookup="projects")
-issues_router.register(r"issues/?", views.IssueViewSet, basename="issues")
+issues_router.register(r"issues/?", IssueViewSet, basename="issues")
 
 contributors_router = routers.NestedSimpleRouter(projects_router, r"projects/?", lookup="projects")
-contributors_router.register(r"contributors/?", views.ContributorViewSet, basename="contributors")
+contributors_router.register(r"contributors/?", ContributorViewSet, basename="contributors")
 
 comments_router = routers.NestedSimpleRouter(issues_router, r"issues/?", lookup="issues")
-comments_router.register(r"comments/?", views.CommentViewSet, basename="comments")
+comments_router.register(r"comments/?", CommentViewSet, basename="comments")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
