@@ -7,14 +7,14 @@ from django.db.models import Q
 
 from .models import Contributor
 from .serializers import ContributorSerializer
-
+from .permissions import IsCreator, IsContributor
 
 class ContributorViewSet(ModelViewSet):
 
     """ Le ModelViewSet des contributeurs """
 
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCreator | IsContributor]
 
     def get_queryset(self):
         queryset = Contributor.objects.all()

@@ -27,7 +27,7 @@ class ProjectViewSet(MultipleSerializerMixin, ModelViewSet):
 
     serializer_class = ProjectSerializer
     detail_serializer_class = ProjectDetailSerializer
-    permission_classes = [IsProjectAuthor | IsProjectContributor]
+    permission_classes = [IsProjectAuthor | IsProjectContributor, IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
         if "pk" in self.kwargs:

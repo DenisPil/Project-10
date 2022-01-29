@@ -28,7 +28,7 @@ comments_router.register(r"comments/?", CommentViewSet, basename="comments")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='obtain_tokens'),
+    path('login/', TokenObtainPairView.as_view(), name='obtain_tokens'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='refresh_token'),
     path("", include(projects_router.urls)),
     path("", include(issues_router.urls)),
