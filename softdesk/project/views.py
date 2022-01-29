@@ -9,6 +9,7 @@ from .models import Project
 from .permissions import IsProjectAuthor, IsProjectContributor
 from rest_framework.permissions import IsAuthenticated
 
+
 class MultipleSerializerMixin:
 
     """ Mixin permet d'afficher les vues en détail ou en liste"""

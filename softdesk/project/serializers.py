@@ -5,9 +5,8 @@ from issue.serializers import IssueSerializer
 from user.serializers import UserSerializer
 from contributor.serializers import ContributorForProjectSerializer
 
+
 class ProjectSerializer(serializers.ModelSerializer):
-    
-    
 
     class Meta:
         model = Project
