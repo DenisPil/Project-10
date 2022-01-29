@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 
 class MultipleSerializerMixin:
 
-    """ Mixin permet d'afficher les vue en détail ou en liste"""
+    """ Mixin permet d'afficher les vues en détail ou en liste"""
 
     detail_serializer_class = None
 
